@@ -1,0 +1,272 @@
+
+$State= 		#0
+$Location=		#0
+
+$StartTuples: 		.#0 | .'_' | .#0 | .'_' | .#1
+			.#0 | .'X' | .#0 | .'A' | .#1
+			.#0 | .'.' | .#0 | .'.' | .#1
+			.#0 | .'Y' | .#0 | .'B' | .#1
+			.#0 | .'+' | .#1 | .'+' | .#-1
+			.#1 | .'B' | .#1 | .'D' | .#-1
+			.#1 | .'.' | .#1 | .'.' | .#-1
+			.#1 | .'A' | .#1 | .'C' | .#-1
+$EndTuples:
+
+$Tape: 			."_XX.YYY+"
+$EndTape:
+
+$StartTape= ($Tape + #1)
+
+
+$IntroString: 		."Welcome to Turing!\n\n"
+$TuplesAreString:	."Tuples:\n"
+$InitialStateString:	."\nInitial State: "
+$InitialIndexString:	."\nInitial Tape Head: "
+$InitialTapeString:	."\nInitial Tape: "
+$EndString:		."Turing run complete\n\n"
+$FinalTapeString:	."Final Tape: "
+$FinalStepString1:	."That took "
+$FinalStepString2:	." step"
+
+$OpenBrace=		@[
+$CloseBrace= 		@]
+$LetterS=		@s
+
+
+;Register Usage:
+
+
+$rDirection= 		$r0
+$rState=		$r1
+$rCharacter=		$r2
+$rLocation=		$r3
+$rCounter=		$r4
+
+$rIterator=		$r5
+
+$rSub1=			$r6
+$rSub2=			$r7
+
+
+
+$START:
+	;Setting up Registers
+			movir $State $rState
+
+			movir $StartTuples $rIterator
+
+			movir ($StartTape + $Location) $rLocation
+
+			movxr $rLocation $rCharacter
+
+	;Prints	first few
+			outs $IntroString
+			outs $TuplesAreString
+
+
+		$TuplePrintDo:
+			$rTPD_Temp= $rSub1
+
+				$BADLINE: movxr $rIterator $rTPD_Temp
+				printi $rTPD_Temp
+					outci $SPACE
+					addir #1 $rIterator
+				outcx $rIterator
+					outci $SPACE
+					addir #1 $rIterator
+				movxr $rIterator $rTPD_Temp
+				printi $rTPD_Temp
+					outci $SPACE
+					addir #1 $rIterator
+				outcx $rIterator
+					outci $SPACE
+					addir #1 $rIterator
+				movxr $rIterator $rTPD_Temp
+				printi $rTPD_Temp
+					outci $NEWLINE
+					addir #1 $rIterator
+
+			;$rIterator < $EndTuples {jump to $TuplePrintDo}
+			cmpir $EndTuples $rIterator
+			jmpn $TuplePrintDo
+		;End TuplePrintDo
+
+	;Prints remaining
+			$rPR_Temp= $rSub1
+
+			outs $InitialStateString
+			printi $rState
+
+			outs $InitialIndexString
+			movir $Location $rPR_Temp
+			printi $rPR_Temp
+
+			outs $InitialTapeString
+			outs $Tape
+			outci $NEWLINE
+			outci $NEWLINE
+
+	;jsr $Loop
+
+
+
+$Loop:
+			jsr $ValidateLocation
+
+			jsr $DoTupleStuff
+
+			addir #1 $rCounter
+
+	jmp $Loop
+
+
+$ValidateLocation:
+			;$rLocation < $StartTape {jump to $EndLeft}
+			cmpir  $StartTape $rLocation
+			jmpn $EndLeft
+
+			;$rLocation >= $EndTape {jump to $EndRight}
+			cmpir ($EndTape - #1) $rLocation
+			
+			jmpp $EndRight
+
+	ret
+
+		$OffTheLeftString: ."Off the left end of the tape\n"
+	$EndLeft:
+			outs $OffTheLeftString
+		
+		jmp $EndProgram
+	
+		$OffTheRightString: ."Off the right end of the tape\n"
+	$EndRight:
+			outs $OffTheRightString
+
+		jmp $EndProgram
+
+$DoTupleStuff:
+		$rNewCharacter= $rSub1
+		$rNewState= $rSub2
+
+			movxr $rLocation $rCharacter
+
+			movir $StartTuples $rIterator
+
+		$FindTupleDo:
+				movxr $rIterator $rNewState
+					addir #1 $rIterator
+				movxr $rIterator $rNewCharacter
+
+				;$rState != $rNewState OR $rCharacter != $rNewCharacter {jump to $LastBitFindTupleDo}
+				;else {jump to $EndFindTupleDo}
+				cmprr $rState $rNewState
+				jmpne $LastBitFindTupleDo
+
+				cmprr $rCharacter $rNewCharacter
+				jmpne $LastBitFindTupleDo
+
+				jmp $EndFindTupleDo
+
+		$LastBitFindTupleDo:
+				addir #4 $rIterator
+
+				;$rIterator < $EndTuples {jump to $FindTupleDo} else {jump to $EndNotFound}
+				cmpir $EndTuples $rIterator
+				jmpn $FindTupleDo
+				jmp $EndNotFound
+				
+		$EndFindTupleDo:
+			
+			jsr $PrintTape
+
+			;$rIterator is now on the old character
+				addir #1 $rIterator
+			movxr $rIterator $rNewState
+				addir #1 $rIterator
+			movxr $rIterator $rNewCharacter
+				addir #1 $rIterator
+			movxr $rIterator $rDirection
+
+				outci $SPACE
+			printi $rState
+				outci $SPACE
+			outcr $rCharacter
+				outci $SPACE
+			printi $rNewState
+				outci $SPACE
+			outcr $rNewCharacter
+				outci $SPACE
+			printi $rDirection
+				outci $NEWLINE
+
+			movrr $rNewState $rState
+			movrx $rNewCharacter $rLocation
+			addrr $rDirection $rLocation
+			movxr $rLocation $rCharacter
+	ret
+
+		$NoTupleFoundString1: ."No tuple found for state: "
+		$NoTupleFoundString2: .", character: "
+	$EndNotFound:
+		outci $NEWLINE
+		outs $NoTupleFoundString1
+		printi $rState
+		outs $NoTupleFoundString2
+		outcr $rCharacter
+		outci $NEWLINE
+
+	jmp $EndProgram
+
+$PrintTape:
+		$rPT_Start= $rSub1
+		$rPT_Count= $rSub2
+
+			movir $StartTape $rPT_Start
+
+			movrr $rLocation $rPT_Count
+			subrr $rPT_Start $rPT_Count
+
+			outcb $rPT_Start $rPT_Count
+
+			outci $OpenBrace
+			outcx $rLocation
+			outci $CloseBrace
+			
+			movrr $rLocation $rPT_Start
+			addir #1 $rPT_Start
+
+			movir $EndTape $rPT_Count
+			subrr $rPT_Start $rPT_Count
+
+			outcb $rPT_Start $rPT_Count
+
+	ret
+
+$EndProgram:
+			outci $NEWLINE
+			outs $EndString
+
+			outs $FinalTapeString
+			outs $Tape
+			outci $NEWLINE
+			
+			outs $FinalStepString1
+			printi $rCounter
+			outs $FinalStepString2
+
+			cmpir #1 $rCounter
+			jmpz $Halt
+
+			outci $LetterS
+
+	$Halt:	halt
+			
+
+			
+	
+
+
+
+
+
+

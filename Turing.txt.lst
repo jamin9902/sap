@@ -1,0 +1,225 @@
+0:                             .start Start
+0:                             ;
+0:    0                        State: 		.integer #0
+1:    0                        Location: 	.integer #0
+2:    0 95 0 95                TupleStorage: 	.tuple \0 _ 0 _ r\
+7:    0 88 0 65                		.tuple \0 X 0 A r\
+12:   0 46 0 46                		.tuple \0 . 0 . r\
+17:   0 89 0 66                		.tuple \0 Y 0 B r\
+22:   0 43 1 43                		.tuple \0 + 1 + l\
+27:   1 66 1 68                		.tuple \1 B 1 D l\
+32:   1 46 1 46                		.tuple \1 . 1 . l\
+37:   1 65 1 67                		.tuple \1 A 1 C l\
+42:   8 95 88 88               TapeStorage: 	.string "_XX.YYY+"
+51:                            ;
+51:                            ;
+51:   56                       EndTapeWhere: nop
+52:                            ;
+52:                            ;
+52:   0                        StartTuples:	.integer #0
+53:   0                        EndTuples:	.integer #0
+54:   0                        StartTape:	.integer #0
+55:   0                        EndTape:	.integer #0
+56:                            ;
+56:                            ;
+56:   18 87 101 108            IntroString: 	.string "Welcome to Turing!"
+75:   7 84 117 112             TuplesString:	.string "Tuples:"
+83:   15 73 110 105            IStateString:	.string "Initial State: "
+99:   19 73 110 105            IIndexString:	.string "Initial Tape Head: "
+119:  14 73 110 105            ITapeString:	.string "Initial Tape: "
+134:  19 84 117 114            EndString:	.string "Turing run complete"
+154:  12 70 105 110            FTapeString:	.string "Final Tape: "
+167:  10 84 104 97             FStep1String:	.string "That took "
+178:  6 32 115 116             FStep2String:	.string " steps"
+185:                           ;
+185:  32                       Space:		.integer #32
+186:  10                       Newline: 	.integer #10
+187:  91                       OpenBrace: 	.integer #91
+188:  93                       CloseBrace: 	.integer #93
+189:                           ;
+189:                           ;Register Usage: nop
+189:                           ;r0 = direction
+189:                           ;r1 = state
+189:                           ;r2 = char
+189:                           ;
+189:                           ;r3 = Flex
+189:                           ;r4 = Flex
+189:                           ;r5 = Flex
+189:                           ;
+189:                           ;r6 = Flex
+189:                           ;
+189:                           ;r7 = tape location
+189:                           ;
+189:                           ;r8 = step counter
+189:                           ;r9 = Flex
+189:                           ;
+189:  56                       Start:			nop
+190:                           			;Initializes r1 as State
+190:  8 0 1                    			movmr State r1 Errors: Invalid args
+193:                           			;
+193:                           			;Initializes memory constants
+193:  10 51 7                  			movar EndTapeWhere r7 Errors: Invalid args
+196:  7 7 55                   			movrm r7 EndTape Errors: Invalid args
+199:  10 42 7                  			movar TapeStorage r7			 Errors: Invalid args
+202:  12 1 7                   			addir #1 r7		;0 indexes tape instead of 1 indexing Errors: Invalid args
+205:  7 7 54                   			movrm r7 StartTape Errors: Invalid args
+208:  14 1 7                   			addmr Location r7 Errors: Invalid args
+211:                           			;
+211:  10 42 6                  			movar TapeStorage r6 Errors: Invalid args
+214:  7 6 53                   			movrm r6 EndTuples Errors: Invalid args
+217:  10 2 6                   			movar TupleStorage r6 Errors: Invalid args
+220:  7 6 52                   			movrm r6 StartTuples Errors: Invalid args
+223:                           			;
+223:  8 186 5                  	Prints:		movmr Newline r5 Errors: Invalid args
+226:  8 185 4                  			movmr Space r4 Errors: Invalid args
+229:  55 56                    			outs IntroString Errors: Invalid args
+231:  45 5                     			outcr r5 Errors: Invalid args
+233:  45 5                     			outcr r5 Errors: Invalid args
+235:                           			;
+235:  55 75                    			outs TuplesString Errors: Invalid args
+237:  45 5                     			outcr r5 Errors: Invalid args
+239:                           			;
+239:                           			;
+239:  9 6 3                    	TuplePrintDo: 	movxr r6 r3 Errors: Invalid args
+242:  49 3                     			printi r3 Errors: Invalid args
+244:                           			;
+244:  45 4                     			outcr r4 Errors: Invalid args
+246:  12 1 6                   			addir #1 r6 Errors: Invalid args
+249:                           			;
+249:  46 6                     			outcx r6 Errors: Invalid args
+251:                           			;
+251:  45 4                     			outcr r4 Errors: Invalid args
+253:  12 1 6                   			addir #1 r6 Errors: Invalid args
+256:                           			;
+256:  9 6 3                    			movxr r6 r3 Errors: Invalid args
+259:  49 3                     			printi r3 Errors: Invalid args
+261:                           			;
+261:  45 4                     			outcr r4 Errors: Invalid args
+263:  12 1 6                   			addir #1 r6 Errors: Invalid args
+266:                           			;
+266:  46 6                     			outcx r6 Errors: Invalid args
+268:                           			;
+268:  45 4                     			outcr r4 Errors: Invalid args
+270:  12 1 6                   			addir #1 r6 Errors: Invalid args
+273:                           			;
+273:  9 6 3                    			movxr r6 r3 Errors: Invalid args
+276:  49 3                     			printi r3 Errors: Invalid args
+278:                           			;
+278:  45 5                     			outcr r5 Errors: Invalid args
+280:  12 1 6                   			addir #1 r6 Errors: Invalid args
+283:  35 53 6                  			cmpmr EndTuples r6 Errors: Invalid args
+286:  57 239                   			jmpne TuplePrintDo Errors: Invalid args
+288:                           			;
+288:  45 5                     	NextBit:	outcr r5 Errors: Invalid args
+290:                           			;
+290:  55 83                    			outs IStateString Errors: Invalid args
+292:  49 1                     			printi r1 Errors: Invalid args
+294:  45 5                     			outcr r5 Errors: Invalid args
+296:                           			;
+296:  55 99                    			outs IIndexString Errors: Invalid args
+298:  8 1 9                    			movmr Location r9 Errors: Invalid args
+301:  49 9                     			printi r9 Errors: Invalid args
+303:  45 5                     			outcr r5 Errors: Invalid args
+305:                           			;
+305:  55 119                   			outs ITapeString Errors: Invalid args
+307:  55 42                    			outs TapeStorage Errors: Invalid args
+309:  45 5                     			outcr r5 Errors: Invalid args
+311:                           			;
+311:  45 5                     			outcr r5 Errors: Invalid args
+313:                           			;
+313:  56                       Loop: nop			;Main loop
+314:  39 395                   			jsr ValidateTapeIndex Errors: Invalid args
+316:  39 361                   			jsr PrintTape Errors: Invalid args
+318:  9 7 2                    			movxr r7 r2 Errors: Invalid args
+321:  39 407                   			jsr GetTuple Errors: Invalid args
+323:  8 186 5                  			movmr Newline r5 Errors: Invalid args
+326:  45 5                     			outcr r5 Errors: Invalid args
+328:  13 0 7                   			addrr r0 r7 Errors: Invalid args
+331:  12 1 8                   			addir #1 r8 Errors: Invalid args
+334:  28 313                   			jmp Loop Errors: Invalid args
+336:                           			;
+336:  56                       EndProgram: nop		;
+337:  8 186 5                  			movmr Newline r5 Errors: Invalid args
+340:  45 5                     			outcr r5 Errors: Invalid args
+342:  55 134                   			outs EndString Errors: Invalid args
+344:  45 5                     			outcr r5 Errors: Invalid args
+346:  55 154                   			outs FTapeString Errors: Invalid args
+348:  55 42                    			outs TapeStorage Errors: Invalid args
+350:  45 5                     			outcr r5 Errors: Invalid args
+352:  55 167                   			outs FStep1String Errors: Invalid args
+354:  49 8                     			printi r8 Errors: Invalid args
+356:  55 178                   			outs FStep2String Errors: Invalid args
+358:  45 5                     			outcr r5 Errors: Invalid args
+360:  0                        			halt
+361:                           			;
+361:  56                       PrintTape: nop			;Prints the fucking tape with the brackets
+362:  8 54 3                   			movmr StartTape r3 Errors: Invalid args
+365:  34 3 7                   	TapePrintDo:	cmprr r3 r7 Errors: Invalid args
+368:  57 384                   			jmpne NormalPrint Errors: Invalid args
+370:  8 187 4                  	BracketPrint:	movmr OpenBrace r4 Errors: Invalid args
+373:  45 4                     			outcr r4 Errors: Invalid args
+375:  46 3                     			outcx r3 Errors: Invalid args
+377:  8 188 4                  			movmr CloseBrace r4 Errors: Invalid args
+380:  45 4                     			outcr r4 Errors: Invalid args
+382:  28 386                   			jmp EndPrintDo Errors: Invalid args
+384:  46 3                     	NormalPrint:	outcx r3 Errors: Invalid args
+386:  12 1 3                   	EndPrintDo:	addir #1 r3 Errors: Invalid args
+389:  35 55 3                  			cmpmr EndTape r3 Errors: Invalid args
+392:  57 365                   			jmpne TapePrintDo Errors: Invalid args
+394:  40                       			ret
+395:                           			;
+395:  56                       ValidateTapeIndex: nop		;Checks if it ran of the end of the tape
+396:  35 54 7                  			cmpmr StartTape r7 Errors: Invalid args
+399:  36 336                   			jmpn EndProgram		;Before start of tape Errors: Invalid args
+401:  35 55 7                  			cmpmr EndTape r7 Errors: Invalid args
+404:  37 336                   			jmpz EndProgram		;After end of tape Errors: Invalid args
+406:  40                       			ret
+407:                           			;
+407:  56                       GetTuple: nop			;r1 is current state, r2 is current character, returns direction in r0, new state in r1, and new character in r2
+408:  8 52 6                   			movmr StartTuples r6 Errors: Invalid args
+411:                           			;
+411:  5 0 4                    	GetDo: 		movir #0 r4		;tuple old state to r4 (0 is old state location) Errors: Invalid args
+414:  13 6 4                   			addrr r6 r4 Errors: Invalid args
+417:  9 4 4                    			movxr r4 r4 Errors: Invalid args
+420:                           			;
+420:  5 1 5                    			movir #1 r5		;tuple old char to r5 (1 is old char location) Errors: Invalid args
+423:  13 6 5                   			addrr r6 r5 Errors: Invalid args
+426:  9 5 5                    			movxr r5 r5 Errors: Invalid args
+429:                           			;
+429:  34 1 4                   			cmprr r1 r4		;compares current state and char with tuple Errors: Invalid args
+432:  57 493                   			jmpne EndGetDo Errors: Invalid args
+434:  34 2 5                   			cmprr r2 r5 Errors: Invalid args
+437:  57 493                   			jmpne EndGetDo Errors: Invalid args
+439:                           			;
+439:  8 185 9                  	AllGood:	movmr Space r9 Errors: Invalid args
+442:  45 9                     			outcr r9 Errors: Invalid args
+444:  49 1                     			printi r1 Errors: Invalid args
+446:  45 9                     			outcr r9 Errors: Invalid args
+448:  45 2                     			outcr r2 Errors: Invalid args
+450:  45 9                     			outcr r9 Errors: Invalid args
+452:                           			;
+452:  5 4 0                    			movir #4 r0		;tuple direction to r0 (4 is direction location) Errors: Invalid args
+455:  13 6 0                   			addrr r6 r0 Errors: Invalid args
+458:  9 0 0                    			movxr r0 r0 Errors: Invalid args
+461:                           			;
+461:  5 2 1                    			movir #2 r1		;tuple new state to r1 (2 is new state location) Errors: Invalid args
+464:  13 6 1                   			addrr r6 r1 Errors: Invalid args
+467:  9 1 1                    			movxr r1 r1 Errors: Invalid args
+470:                           			;
+470:  5 3 2                    			movir #3 r2		;tuple new char to r2 (3 is new state location) Errors: Invalid args
+473:  13 6 2                   			addrr r6 r2 Errors: Invalid args
+476:  9 2 2                    			movxr r2 r2 Errors: Invalid args
+479:                           			;
+479:  49 1                     			printi r1 Errors: Invalid args
+481:  45 9                     			outcr r9 Errors: Invalid args
+483:  45 2                     			outcr r2 Errors: Invalid args
+485:  45 9                     			outcr r9 Errors: Invalid args
+487:  49 0                     			printi r0 Errors: Invalid args
+489:  53 2 7                   			movrx r2 r7 Errors: Invalid args
+492:  40                       			ret
+493:                           			;
+493:  12 5 6                   	EndGetDo:	addir #5 r6		;moves to the next tuple (5 is tuple length) Errors: Invalid args
+496:  35 53 6                  			cmpmr EndTuples r6		;checks if looped through all the tuples Errors: Invalid args
+499:  57 411                   			jmpne GetDo Errors: Invalid args
+501:  28 336                   			jmp EndProgram		;no tuple for specified case Errors: Invalid args
+503:                           			;

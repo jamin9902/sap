@@ -1,0 +1,225 @@
+.start Start
+;
+State: 		.integer #0
+Location: 	.integer #0
+TupleStorage: 	.tuple \0 _ 0 _ r\
+		.tuple \0 X 0 A r\
+		.tuple \0 . 0 . r\
+		.tuple \0 Y 0 B r\
+		.tuple \0 + 1 + l\
+		.tuple \1 B 1 D l\
+		.tuple \1 . 1 . l\
+		.tuple \1 A 1 C l\
+TapeStorage: 	.string "_XX.YYY+"
+;
+;
+EndTapeWhere: nop
+;
+;
+StartTuples:	.integer #0
+EndTuples:	.integer #0
+StartTape:	.integer #0
+EndTape:	.integer #0
+;
+;
+IntroString: 	.string "Welcome to Turing!"
+TuplesString:	.string "Tuples:"
+IStateString:	.string "Initial State: "
+IIndexString:	.string "Initial Tape Head: "
+ITapeString:	.string "Initial Tape: "
+EndString:	.string "Turing run complete"
+FTapeString:	.string "Final Tape: "
+FStep1String:	.string "That took "
+FStep2String:	.string " steps"
+;
+Space:		.integer #32
+Newline: 	.integer #10
+OpenBrace: 	.integer #91
+CloseBrace: 	.integer #93
+;
+;Register Usage: nop
+;r0 = direction
+;r1 = state
+;r2 = char
+;
+;r3 = Flex
+;r4 = Flex
+;r5 = Flex
+;
+;r6 = Flex
+;
+;r7 = tape location
+;
+;r8 = step counter
+;r9 = Flex
+;
+Start:			nop
+			;Initializes r1 as State
+			movmr State r1
+			;
+			;Initializes memory constants
+			movar EndTapeWhere r7
+			movrm r7 EndTape
+			movar TapeStorage r7			
+			addir #1 r7		;0 indexes tape instead of 1 indexing
+			movrm r7 StartTape
+			addmr Location r7
+			;
+			movar TapeStorage r6
+			movrm r6 EndTuples
+			movar TupleStorage r6
+			movrm r6 StartTuples
+			;
+	Prints:		movmr Newline r5
+			movmr Space r4
+			outs IntroString
+			outcr r5
+			outcr r5
+			;
+			outs TuplesString
+			outcr r5
+			;
+			;
+	TuplePrintDo: 	movxr r6 r3
+			printi r3
+			;
+			outcr r4
+			addir #1 r6
+			;
+			outcx r6
+			;
+			outcr r4
+			addir #1 r6
+			;
+			movxr r6 r3
+			printi r3
+			;
+			outcr r4
+			addir #1 r6
+			;
+			outcx r6
+			;
+			outcr r4
+			addir #1 r6
+			;
+			movxr r6 r3
+			printi r3
+			;
+			outcr r5
+			addir #1 r6
+			cmpmr EndTuples r6
+			jmpne TuplePrintDo
+			;
+	NextBit:	outcr r5
+			;
+			outs IStateString
+			printi r1
+			outcr r5
+			;
+			outs IIndexString
+			movmr Location r9
+			printi r9
+			outcr r5
+			;
+			outs ITapeString
+			outs TapeStorage
+			outcr r5
+			;
+			outcr r5
+			;
+Loop: nop			;Main loop
+			jsr ValidateTapeIndex
+			jsr PrintTape
+			movxr r7 r2
+			jsr GetTuple
+			movmr Newline r5
+			outcr r5
+			addrr r0 r7
+			addir #1 r8
+			jmp Loop
+			;
+EndProgram: nop		;
+			movmr Newline r5
+			outcr r5
+			outs EndString
+			outcr r5
+			outs FTapeString
+			outs TapeStorage
+			outcr r5
+			outs FStep1String
+			printi r8
+			outs FStep2String
+			outcr r5
+			halt
+			;
+PrintTape: nop			;Prints the fucking tape with the brackets
+			movmr StartTape r3
+	TapePrintDo:	cmprr r3 r7
+			jmpne NormalPrint
+	BracketPrint:	movmr OpenBrace r4
+			outcr r4
+			outcx r3
+			movmr CloseBrace r4
+			outcr r4
+			jmp EndPrintDo
+	NormalPrint:	outcx r3
+	EndPrintDo:	addir #1 r3
+			cmpmr EndTape r3
+			jmpne TapePrintDo
+			ret
+			;
+ValidateTapeIndex: nop		;Checks if it ran of the end of the tape
+			cmpmr StartTape r7
+			jmpn EndProgram		;Before start of tape
+			cmpmr EndTape r7
+			jmpz EndProgram		;After end of tape
+			ret
+			;
+GetTuple: nop			;r1 is current state, r2 is current character, returns direction in r0, new state in r1, and new character in r2
+			movmr StartTuples r6
+			;
+	GetDo: 		movir #0 r4		;tuple old state to r4 (0 is old state location)
+			addrr r6 r4
+			movxr r4 r4
+			;
+			movir #1 r5		;tuple old char to r5 (1 is old char location)
+			addrr r6 r5
+			movxr r5 r5
+			;
+			cmprr r1 r4		;compares current state and char with tuple
+			jmpne EndGetDo
+			cmprr r2 r5
+			jmpne EndGetDo
+			;
+	AllGood:	movmr Space r9
+			outcr r9
+			printi r1
+			outcr r9
+			outcr r2
+			outcr r9
+			;
+			movir #4 r0		;tuple direction to r0 (4 is direction location)
+			addrr r6 r0
+			movxr r0 r0
+			;
+			movir #2 r1		;tuple new state to r1 (2 is new state location)
+			addrr r6 r1
+			movxr r1 r1
+			;
+			movir #3 r2		;tuple new char to r2 (3 is new state location)
+			addrr r6 r2
+			movxr r2 r2
+			;
+			printi r1
+			outcr r9
+			outcr r2
+			outcr r9
+			printi r0
+			movrx r2 r7
+			ret
+			;
+	EndGetDo:	addir #5 r6		;moves to the next tuple (5 is tuple length)
+			cmpmr EndTuples r6		;checks if looped through all the tuples
+			jmpne GetDo
+			jmp EndProgram		;no tuple for specified case
+			;

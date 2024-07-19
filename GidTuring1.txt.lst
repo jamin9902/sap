@@ -1,0 +1,229 @@
+0:                             $State= 		#0 
+0:                             $Location=		#0 
+0:    0                        $StartTuples: 		.#0  
+1:    95                        .'_'  
+2:    0                         .#0  
+3:    95                        .'_'  
+4:    1                         .#1 
+5:    0                        			.#0  
+6:    88                        .'X'  
+7:    0                         .#0  
+8:    65                        .'A'  
+9:    1                         .#1 
+10:   0                        			.#0  
+11:   46                        .'.'  
+12:   0                         .#0  
+13:   46                        .'.'  
+14:   1                         .#1 
+15:   0                        			.#0  
+16:   89                        .'Y'  
+17:   0                         .#0  
+18:   66                        .'B'  
+19:   1                         .#1 
+20:   0                        			.#0  
+21:   43                        .'+'  
+22:   1                         .#1  
+23:   43                        .'+'  
+24:   -1                        .#-1 
+25:   1                        			.#1  
+26:   66                        .'B'  
+27:   1                         .#1  
+28:   68                        .'D'  
+29:   -1                        .#-1 
+30:   1                        			.#1  
+31:   46                        .'.'  
+32:   1                         .#1  
+33:   46                        .'.'  
+34:   -1                        .#-1 
+35:   1                        			.#1  
+36:   65                        .'A'  
+37:   1                         .#1  
+38:   67                        .'C'  
+39:   -1                        .#-1 
+40:                            $EndTuples: 
+40:   8 95 88 88               $Tape: 			."_XX.YYY+" 
+49:                            $EndTape: 
+49:                            $StartTape= ($Tape + #1) 
+49:   20 87 101 108            $IntroString: 		."Welcome to Turing!\n\n" 
+70:   8 84 117 112             $TuplesAreString:	."Tuples:\n" 
+79:   16 10 73 110             $InitialStateString:	."\nInitial State: " 
+96:   20 10 73 110             $InitialIndexString:	."\nInitial Tape Head: " 
+117:  15 10 73 110             $InitialTapeString:	."\nInitial Tape: " 
+133:  21 84 117 114            $EndString:		."Turing run complete\n\n" 
+155:  12 70 105 110            $FinalTapeString:	."Final Tape: " 
+168:  10 84 104 97             $FinalStepString1:	."That took " 
+179:  5 32 115 116             $FinalStepString2:	." step" 
+185:                           $OpenBrace=		@[ 
+185:                           $CloseBrace= 		@] 
+185:                           $LetterS=		@s 
+185:                           ;Register Usage: 
+185:                           $rDirection= 		$r0 
+185:                           $rState=		$r1 
+185:                           $rCharacter=		$r2 
+185:                           $rLocation=		$r3 
+185:                           $rCounter=		$r4 
+185:                           $rIterator=		$r5 
+185:                           $rSub1=			$r6 
+185:                           $rSub2=			$r7 
+185:                           $START: 
+185:                           	;Setting up Registers 
+185:  5 0 1                    			movir $State $rState 
+188:  5 0 5                    			movir $StartTuples $rIterator 
+191:  5 41 3                   			movir ($StartTape + $Location) $rLocation 
+194:  9 3 2                    			movxr $rLocation $rCharacter 
+197:                           	;Prints	first few 
+197:  55 49                    			outs $IntroString 
+199:  55 70                    			outs $TuplesAreString 
+201:                           		$TuplePrintDo: 
+201:                           			$rTPD_Temp= $rSub1 
+201:  9 5 6                    				$BADLINE: movxr $rIterator $rTPD_Temp 
+204:  49 6                     				printi $rTPD_Temp 
+206:  44 32                    					outci $SPACE 
+208:  12 1 5                   					addir #1 $rIterator 
+211:  46 5                     				outcx $rIterator 
+213:  44 32                    					outci $SPACE 
+215:  12 1 5                   					addir #1 $rIterator 
+218:  9 5 6                    				movxr $rIterator $rTPD_Temp 
+221:  49 6                     				printi $rTPD_Temp 
+223:  44 32                    					outci $SPACE 
+225:  12 1 5                   					addir #1 $rIterator 
+228:  46 5                     				outcx $rIterator 
+230:  44 32                    					outci $SPACE 
+232:  12 1 5                   					addir #1 $rIterator 
+235:  9 5 6                    				movxr $rIterator $rTPD_Temp 
+238:  49 6                     				printi $rTPD_Temp 
+240:  44 10                    					outci $NEWLINE 
+242:  12 1 5                   					addir #1 $rIterator 
+245:                           			;$rIterator < $EndTuples {jump to $TuplePrintDo} 
+245:  33 40 5                  			cmpir $EndTuples $rIterator 
+248:  36 201                   			jmpn $TuplePrintDo 
+250:                           		;End TuplePrintDo 
+250:                           	;Prints remaining 
+250:                           			$rPR_Temp= $rSub1 
+250:  55 79                    			outs $InitialStateString 
+252:  49 1                     			printi $rState 
+254:  55 96                    			outs $InitialIndexString 
+256:  5 0 6                    			movir $Location $rPR_Temp 
+259:  49 6                     			printi $rPR_Temp 
+261:  55 117                   			outs $InitialTapeString 
+263:  55 40                    			outs $Tape 
+265:  44 10                    			outci $NEWLINE 
+267:  44 10                    			outci $NEWLINE 
+269:                           	;jsr $Loop 
+269:                           $Loop: 
+269:  39 278                   			jsr $ValidateLocation 
+271:  39 358                   			jsr $DoTupleStuff 
+273:  12 1 4                   			addir #1 $rCounter 
+276:  28 269                   	jmp $Loop 
+278:                           $ValidateLocation: 
+278:                           			;$rLocation < $StartTape {jump to $EndLeft} 
+278:  33 41 3                  			cmpir  $StartTape $rLocation 
+281:  36 319                   			jmpn $EndLeft 
+283:                           			;$rLocation >= $EndTape {jump to $EndRight} 
+283:  33 48 3                  			cmpir ($EndTape - #1) $rLocation 
+286:                           			 
+286:  38 354                   			jmpp $EndRight 
+288:  40                       	ret 
+289:  29 79 102 102            		$OffTheLeftString: ."Off the left end of the tape\n" 
+319:                           	$EndLeft: 
+319:  55 289                   			outs $OffTheLeftString 
+321:                           		 
+321:  28 539                   		jmp $EndProgram 
+323:                           	 
+323:  30 79 102 102            		$OffTheRightString: ."Off the right end of the tape\n" 
+354:                           	$EndRight: 
+354:  55 323                   			outs $OffTheRightString 
+356:  28 539                   		jmp $EndProgram 
+358:                           $DoTupleStuff: 
+358:                           		$rNewCharacter= $rSub1 
+358:                           		$rNewState= $rSub2 
+358:  9 3 2                    			movxr $rLocation $rCharacter 
+361:  5 0 5                    			movir $StartTuples $rIterator 
+364:                           		$FindTupleDo: 
+364:  9 5 7                    				movxr $rIterator $rNewState 
+367:  12 1 5                   					addir #1 $rIterator 
+370:  9 5 6                    				movxr $rIterator $rNewCharacter 
+373:                           				;$rState != $rNewState OR $rCharacter != $rNewCharacter {jump to $LastBitFindTupleDo} 
+373:                           				;else {jump to $EndFindTupleDo} 
+373:  34 1 7                   				cmprr $rState $rNewState 
+376:  57 385                   				jmpne $LastBitFindTupleDo 
+378:  34 2 6                   				cmprr $rCharacter $rNewCharacter 
+381:  57 385                   				jmpne $LastBitFindTupleDo 
+383:  28 395                   				jmp $EndFindTupleDo 
+385:                           		$LastBitFindTupleDo: 
+385:  12 4 5                   				addir #4 $rIterator 
+388:                           				;$rIterator < $EndTuples {jump to $FindTupleDo} else {jump to $EndNotFound} 
+388:  33 40 5                  				cmpir $EndTuples $rIterator 
+391:  36 364                   				jmpn $FindTupleDo 
+393:  28 491                   				jmp $EndNotFound 
+395:                           				 
+395:                           		$EndFindTupleDo: 
+395:                           			 
+395:  39 505                   			jsr $PrintTape 
+397:                           			;$rIterator is now on the old character 
+397:  12 1 5                   				addir #1 $rIterator 
+400:  9 5 7                    			movxr $rIterator $rNewState 
+403:  12 1 5                   				addir #1 $rIterator 
+406:  9 5 6                    			movxr $rIterator $rNewCharacter 
+409:  12 1 5                   				addir #1 $rIterator 
+412:  9 5 0                    			movxr $rIterator $rDirection 
+415:  44 32                    				outci $SPACE 
+417:  49 1                     			printi $rState 
+419:  44 32                    				outci $SPACE 
+421:  45 2                     			outcr $rCharacter 
+423:  44 32                    				outci $SPACE 
+425:  49 7                     			printi $rNewState 
+427:  44 32                    				outci $SPACE 
+429:  45 6                     			outcr $rNewCharacter 
+431:  44 32                    				outci $SPACE 
+433:  49 0                     			printi $rDirection 
+435:  44 10                    				outci $NEWLINE 
+437:  6 7 1                    			movrr $rNewState $rState 
+440:  53 6 3                   			movrx $rNewCharacter $rLocation 
+443:  13 0 3                   			addrr $rDirection $rLocation 
+446:  9 3 2                    			movxr $rLocation $rCharacter 
+449:  40                       	ret 
+450:  26 78 111 32             		$NoTupleFoundString1: ."No tuple found for state: " 
+477:  13 44 32 99              		$NoTupleFoundString2: .", character: " 
+491:                           	$EndNotFound: 
+491:  44 10                    		outci $NEWLINE 
+493:  55 450                   		outs $NoTupleFoundString1 
+495:  49 1                     		printi $rState 
+497:  55 477                   		outs $NoTupleFoundString2 
+499:  45 2                     		outcr $rCharacter 
+501:  44 10                    		outci $NEWLINE 
+503:  28 539                   	jmp $EndProgram 
+505:                           $PrintTape: 
+505:                           		$rPT_Start= $rSub1 
+505:                           		$rPT_Count= $rSub2 
+505:  5 41 6                   			movir $StartTape $rPT_Start 
+508:  6 3 7                    			movrr $rLocation $rPT_Count 
+511:  17 6 7                   			subrr $rPT_Start $rPT_Count 
+514:  47 6 7                   			outcb $rPT_Start $rPT_Count 
+517:  44 91                    			outci $OpenBrace 
+519:  46 3                     			outcx $rLocation 
+521:  44 93                    			outci $CloseBrace 
+523:                           			 
+523:  6 3 6                    			movrr $rLocation $rPT_Start 
+526:  12 1 6                   			addir #1 $rPT_Start 
+529:  5 49 7                   			movir $EndTape $rPT_Count 
+532:  17 6 7                   			subrr $rPT_Start $rPT_Count 
+535:  47 6 7                   			outcb $rPT_Start $rPT_Count 
+538:  40                       	ret 
+539:                           $EndProgram: 
+539:  44 10                    			outci $NEWLINE 
+541:  55 133                   			outs $EndString 
+543:  55 155                   			outs $FinalTapeString 
+545:  55 40                    			outs $Tape 
+547:  44 10                    			outci $NEWLINE 
+549:                           			 
+549:  55 168                   			outs $FinalStepString1 
+551:  49 4                     			printi $rCounter 
+553:  55 179                   			outs $FinalStepString2 
+555:  33 1 4                   			cmpir #1 $rCounter 
+558:  37 562                   			jmpz $Halt 
+560:  44 115                   			outci $LetterS 
+562:  0                        	$Halt:	halt 
+563:                           			 
+563:                           			 
+563:                           	 
